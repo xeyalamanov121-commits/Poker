@@ -1,0 +1,390 @@
+'''html
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Poker Nümunə Masası</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Inter", "Segoe UI", sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(120% 120% at 50% 0%, #0f172a 0%, #020617 100%);
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      width: min(720px, 100%);
+      padding: 24px 20px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .identity p {
+      margin: 0;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .identity h1 {
+      margin: 4px 0 0;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .bankroll {
+      text-align: right;
+    }
+    .bankroll p {
+      margin: 0;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .bankroll span {
+      display: block;
+      font-size: 26px;
+      font-weight: 600;
+      color: #22d3ee;
+    }
+    main {
+      width: min(720px, 100%);
+      padding: 0 20px 32px;
+    }
+    .status-strip {
+      margin: 12px 0 20px;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center.
+    }
+    .status-strip span {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .status-strip strong {
+      font-size: 16px;
+      color: #f8fafc;
+      font-weight: 600;
+    }
+    .table-shell {
+      position: relative;
+      margin: 0 auto;
+      width: min(560px, 100%);
+      aspect-ratio: 4 / 3;
+      border-radius: 999px;
+      background: radial-gradient(circle at 50% 30%, #1d8a66 0%, #12583f 55%, #0b3929 100%);
+      border: 5px solid rgba(12, 54, 39, 0.85);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+      overflow: hidden;
+    }
+    .table-shell::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 999px;
+      border: 2px dashed rgba(227, 252, 239, 0.2);
+    }
+    .pot-display {
+      position: absolute;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      padding: 10px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .pot-title {
+      font-size: 12px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .pot-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #f8fafc.
+    }
+    .community-cards {
+      position: absolute;
+      top: 36%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+    }
+    .card {
+      width: 70px;
+      height: 98px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 2px solid rgba(94, 234, 212, 0.45);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 20px.
+    }
+    .card small {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px.
+    }
+    .card-placeholder {
+      width: 70px;
+      height: 98px;
+      border-radius: 12px;
+      border: 2px dashed rgba(148, 163, 184, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(148, 163, 184, 0.6);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px.
+    }
+    .seat {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 16px;
+      min-width: 110px;
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s ease.
+    }
+    .seat.hero {
+      box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.4);
+    }
+    .seat .name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600.
+    }
+    .dealer-chip {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #facc15;
+      color: #0f172a;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700.
+    }
+    .chips {
+      font-size: 13px;
+      color: #94a3b8.
+    }
+    .action-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #34d399.
+    }
+    .action-panel {
+      margin: 32px auto 0;
+      width: min(420px, 100%);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px.
+    }
+    .action-panel button {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 0;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease.
+    }
+    .action-panel button:active {
+      transform: scale(0.97).
+    }
+    .btn-fold { background: #1e293b; color: #e2e8f0; }
+    .btn-check { background: #34d399; color: #022c22; }
+    .btn-raise { background: #facc15; color: #0f172a; }
+    footer {
+      margin-top: auto;
+      padding: 20px;
+      font-size: 12px;
+      color: rgba(148, 163, 184, 0.6);
+      letter-spacing: 0.8px.
+    }
+    @media (max-width: 540px) {
+      header { flex-direction: column; gap: 12px; align-items: flex-start; }
+      .table-shell { aspect-ratio: 1; }
+      .community-cards, .pot-display { transform: translate(-50%, 0); top: auto; }
+      .community-cards { bottom: 36%; }
+      .pot-display { bottom: 55%; }
+      .seat { min-width: 88px; padding: 8px 10px; }
+      .action-panel { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="identity">
+      <p>Yeni canlı sessiya</p>
+      <h1>Oyuncu_50</h1>
+    </div>
+    <div class="bankroll">
+      <p>Bankroll</p>
+      <span>$12 450</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="status-strip">
+      <span>Vəziyyət: <strong>Kartlar gözlənilir</strong></span>
+      <span>Raund: <strong>Pre-Flop</strong></span>
+    </div>
+
+    <section class="table-shell" id="tableShell">
+      <div class="pot-display">
+        <span class="pot-title">Bank</span>
+        <span class="pot-value" id="potValue">$0</span>
+      </div>
+
+      <div class="community-cards" id="communityCards">
+        <div class="card-placeholder">Card 1</div>
+        <div class="card-placeholder">Card 2</div>
+        <div class="card-placeholder">Card 3</div>
+        <div class="card-placeholder">Card 4</div>
+        <div class="card-placeholder">Card 5</div>
+      </div>
+
+      <div class="seat hero" style="left: 50%; top: 85%;">
+        <div class="name">Oyuncu_50</div>
+        <div class="chips" id="heroChips">9 600 fiş</div>
+        <span class="action-tag" id="heroAction">Sizin növbə</span>
+      </div>
+
+      <div class="seat" style="left: 82%; top: 68%;">
+        <div class="name">ShadowAce</div>
+        <div class="chips">11 200 fiş</div>
+      </div>
+
+      <div class="seat" style="left: 82%; top: 32%;">
+        <div class="name">LuckyFox</div>
+        <div class="chips">8 750 fiş</div>
+        <span class="action-tag">Check</span>
+      </div>
+
+      <div class="seat" style="left: 50%; top: 15%;">
+        <div class="name">NightOwl</div>
+        <div class="chips">10 000 fiş</div>
+        <span class="dealer-chip">D</span>
+      </div>
+
+      <div class="seat" style="left: 18%; top: 32%;">
+        <div class="name">RiverKing</div>
+        <div class="chips">12 800 fiş</div>
+      </div>
+
+      <div class="seat" style="left: 18%; top: 68%;">
+        <div class="name">BluffQueen</div>
+        <div class="chips">7 950 fiş</div>
+        <span class="action-tag">Raise 200</span>
+      </div>
+    </section>
+
+    <div class="action-panel">
+      <button class="btn-fold" data-action="fold">Fold</button>
+      <button class="btn-check" data-action="check">Check</button>
+      <button class="btn-raise" data-action="raise">Raise</button>
+    </div>
+  </main>
+
+  <footer>
+    Demo məqsədlidir — real oyun loqikası backend vasitəsilə idarə olunmalıdır.
+  </footer>
+
+  <script>
+    const communityCards = document.getElementById("communityCards");
+    const potValue = document.getElementById("potValue");
+    const heroAction = document.getElementById("heroAction");
+
+    const sampleDeck = [
+      { rank: "A", suit: "♠" },
+      { rank: "K", suit: "♥" },
+      { rank: "Q", suit: "♦" },
+      { rank: "J", suit: "♣" },
+      { rank: "10", suit: "♠" },
+      { rank: "9", suit: "♥" },
+      { rank: "8", suit: "♦" },
+      { rank: "7", suit: "♣" }
+    ];
+
+    function renderCards(cards) {
+      communityCards.innerHTML = "";
+      cards.forEach(card => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `<div>${card.rank}</div><small>${card.suit}</small>`;
+        communityCards.appendChild(div);
+      });
+    }
+
+    function resetPlaceholders() {
+      communityCards.innerHTML = "";
+      for (let i = 0; i < 5; i += 1) {
+        const holder = document.createElement("div");
+        holder.className = "card-placeholder";
+        holder.textContent = `Card ${i + 1}`;
+        communityCards.appendChild(holder);
+      }
+    }
+
+    function updatePot(amount) {
+      potValue.textContent = `$${amount.toLocaleString("en-US")}`;
+    }
+
+    document.querySelectorAll(".action-panel button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const action = btn.dataset.action;
+        switch (action) {
+          case "fold":
+            heroAction.textContent = "Fold etdiniz";
+            resetPlaceholders();
+            updatePot(0);
+            break;
+          case "check":
+            heroAction.textContent = "Check etdiniz";
+            renderCards(sampleDeck.slice(0, 3));
+            updatePot(450);
+            break;
+          case "raise":
+            heroAction.textContent = "Raise 300";
+            renderCards(sampleDeck.slice(0, 5));
+            updatePot(1250);
+            break;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+'''
